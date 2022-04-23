@@ -1,53 +1,130 @@
-#include <greeter/greeter.h>
-#include <greeter/version.h>
-
-#include <cxxopts.hpp>
 #include <iostream>
 #include <string>
-#include <unordered_map>
+#include <vector>
+#include <math.h>
 
 auto main(int argc, char** argv) -> int {
-  const std::unordered_map<std::string, greeter::LanguageCode> languages{
-      {"en", greeter::LanguageCode::EN},
-      {"de", greeter::LanguageCode::DE},
-      {"es", greeter::LanguageCode::ES},
-      {"fr", greeter::LanguageCode::FR},
-  };
+    // std::cout << "int64_t max: " << std::numeric_limits<int64_t>::max() << std::endl;
 
-  cxxopts::Options options(*argv, "A program to welcome the world!");
+    std::vector<int64_t> stack;
+    stack.push_back(0);
 
-  std::string language;
-  std::string name;
+    while (true) {
+        // Print
+        for (int item : stack) {
+            std::cout << item << std::endl;
+        }
 
-  // clang-format off
-  options.add_options()
-    ("h,help", "Show help")
-    ("v,version", "Print the current version number")
-    ("n,name", "Name to greet", cxxopts::value(name)->default_value("World"))
-    ("l,lang", "Language code to use", cxxopts::value(language)->default_value("en"))
-  ;
-  // clang-format on
+        // Read
+        std::cout << "pancalc> ";
+        std::string buffer;
+        std::getline(std::cin, buffer);
+        
+        // Evaluate
+        if (buffer == "exit") {
+            break;
+        }
+        if (buffer == "clear") {
+            stack.clear();
+            stack.push_back(0);
+            continue;
+        }
+        if (buffer == "pop") {
+            stack.pop_back();
+            if (stack.size() == 0) {
+                stack.push_back(0);
+            }
+            continue;
+        }
+        if (buffer == "+") {
+            if (stack.size() < 2) {
+                std::cout << "Insufficient operands" << std::endl;
+                continue;
+            }
+            int64_t op2 = stack.back();
+            stack.pop_back();
+            int64_t op1 = stack.back();
+            stack.pop_back();
+            int64_t result = op1 + op2;
+            stack.push_back(result);
+            continue;
+        }
+        
+        if (buffer == "-") {
+            if (stack.size() < 2) {
+                std::cout << "Insufficient operands" << std::endl;
+                continue;
+            }
+            int64_t op2 = stack.back();
+            stack.pop_back();
+            int64_t op1 = stack.back();
+            stack.pop_back();
+            int64_t result = op1 - op2;
+            stack.push_back(result);
+            continue;
+        }
 
-  auto result = options.parse(argc, argv);
+        if (buffer == "*") {
+            if (stack.size() < 2) {
+                std::cout << "Insufficient operands" << std::endl;
+                continue;
+            }
+            int64_t op2 = stack.back();
+            stack.pop_back();
+            int64_t op1 = stack.back();
+            stack.pop_back();
+            int64_t result = op1 * op2;
+            stack.push_back(result);
+            continue;
+        }
 
-  if (result["help"].as<bool>()) {
-    std::cout << options.help() << std::endl;
-    return 0;
-  }
+        if (buffer == "/") {
+            if (stack.size() < 2) {
+                std::cout << "Insufficient operands" << std::endl;
+                continue;
+            }
+            int64_t op2 = stack.back();
+            stack.pop_back();
+            int64_t op1 = stack.back();
+            stack.pop_back();
+            int64_t result = op1 / op2;
+            stack.push_back(result);
+            continue;
+        }
 
-  if (result["version"].as<bool>()) {
-    std::cout << "Greeter, version " << GREETER_VERSION << std::endl;
-    return 0;
-  }
+        if (buffer == "%") {
+            if (stack.size() < 2) {
+                std::cout << "Insufficient operands" << std::endl;
+                continue;
+            }
+            int64_t op2 = stack.back();
+            stack.pop_back();
+            int64_t op1 = stack.back();
+            stack.pop_back();
+            int64_t result = op1 % op2;
+            stack.push_back(result);
+            continue;
+        }
 
-  auto langIt = languages.find(language);
-  if (langIt == languages.end()) {
-    std::cerr << "unknown language code: " << language << std::endl;
-    return 1;
-  }
+        if (buffer == "^") {
+            if (stack.size() < 2) {
+                std::cout << "Insufficient operands" << std::endl;
+                continue;
+            }
+            int64_t op2 = stack.back();
+            stack.pop_back();
+            int64_t op1 = stack.back();
+            stack.pop_back();
+            int64_t result = pow(op1, op2);
+            stack.push_back(result);
+            continue;
+        }
 
-  greeter::Greeter greeter(name);
-  std::cout << greeter.greet(langIt->second) << std::endl;
-
-  return 0;
+        try {
+            int64_t operand = std::stoll(buffer);
+            stack.push_back(operand);
+        } catch (std::invalid_argument ex) {
+            std::cout << "Bad input: " << ex.what() << std::endl;
+        }
+    }
 }
