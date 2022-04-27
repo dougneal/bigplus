@@ -2,127 +2,63 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <fmt/format.h>
+
+#include "bigplus/BPScalar.hpp"
+#include "bigplus/BPOperator.hpp"
 
 auto main(int argc, char** argv) -> int {
-    // std::cout << "int64_t max: " << std::numeric_limits<int64_t>::max() << std::endl;
-
-    std::vector<int64_t> stack;
-    stack.push_back(0);
+    std::vector<bigplus::BPScalar> stack;
 
     while (true) {
         // Print
-        for (int item : stack) {
-            std::cout << item << std::endl;
+        for (auto& scalar : stack) {
+            std::cout << scalar.to_string() << std::endl;
         }
 
         // Read
-        std::cout << "pancalc> ";
+        std::cout << "bigplus> ";
         std::string buffer;
         std::getline(std::cin, buffer);
         
         // Evaluate
-        if (buffer == "exit") {
+        if (std::cin.eof() || buffer == "exit") {
             break;
+        }
+        if (buffer == "") {
+            continue;
         }
         if (buffer == "clear") {
             stack.clear();
-            stack.push_back(0);
             continue;
         }
         if (buffer == "pop") {
             stack.pop_back();
-            if (stack.size() == 0) {
-                stack.push_back(0);
-            }
-            continue;
-        }
-        if (buffer == "+") {
-            if (stack.size() < 2) {
-                std::cout << "Insufficient operands" << std::endl;
-                continue;
-            }
-            int64_t op2 = stack.back();
-            stack.pop_back();
-            int64_t op1 = stack.back();
-            stack.pop_back();
-            int64_t result = op1 + op2;
-            stack.push_back(result);
             continue;
         }
         
-        if (buffer == "-") {
+        if (bigplus::BPOperator::binaries.contains(buffer)) {
             if (stack.size() < 2) {
                 std::cout << "Insufficient operands" << std::endl;
                 continue;
             }
-            int64_t op2 = stack.back();
+            bigplus::BPScalar op2 = stack.back();
             stack.pop_back();
-            int64_t op1 = stack.back();
+            bigplus::BPScalar op1 = stack.back();
             stack.pop_back();
-            int64_t result = op1 - op2;
-            stack.push_back(result);
-            continue;
-        }
-
-        if (buffer == "*") {
-            if (stack.size() < 2) {
-                std::cout << "Insufficient operands" << std::endl;
-                continue;
+            try {
+                stack.push_back(
+                    bigplus::BPOperator::binaries.at(buffer)
+                        (op1, op2));
+            } catch (std::runtime_error ex) {
+                std::cout << "Operation error: " << ex.what() << std::endl;
             }
-            int64_t op2 = stack.back();
-            stack.pop_back();
-            int64_t op1 = stack.back();
-            stack.pop_back();
-            int64_t result = op1 * op2;
-            stack.push_back(result);
-            continue;
-        }
-
-        if (buffer == "/") {
-            if (stack.size() < 2) {
-                std::cout << "Insufficient operands" << std::endl;
-                continue;
-            }
-            int64_t op2 = stack.back();
-            stack.pop_back();
-            int64_t op1 = stack.back();
-            stack.pop_back();
-            int64_t result = op1 / op2;
-            stack.push_back(result);
-            continue;
-        }
-
-        if (buffer == "%") {
-            if (stack.size() < 2) {
-                std::cout << "Insufficient operands" << std::endl;
-                continue;
-            }
-            int64_t op2 = stack.back();
-            stack.pop_back();
-            int64_t op1 = stack.back();
-            stack.pop_back();
-            int64_t result = op1 % op2;
-            stack.push_back(result);
-            continue;
-        }
-
-        if (buffer == "^") {
-            if (stack.size() < 2) {
-                std::cout << "Insufficient operands" << std::endl;
-                continue;
-            }
-            int64_t op2 = stack.back();
-            stack.pop_back();
-            int64_t op1 = stack.back();
-            stack.pop_back();
-            int64_t result = pow(op1, op2);
-            stack.push_back(result);
             continue;
         }
 
         try {
             int64_t operand = std::stoll(buffer);
-            stack.push_back(operand);
+            stack.push_back(bigplus::BPScalar(operand));
         } catch (std::invalid_argument ex) {
             std::cout << "Bad input: " << ex.what() << std::endl;
         }
