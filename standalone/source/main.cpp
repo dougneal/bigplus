@@ -37,6 +37,11 @@ auto main(int argc, char** argv) -> int {
             continue;
         }
         
+        if (bigplus::BPOperator::constants.contains(buffer)) {
+            stack.push_back(bigplus::BPOperator::constants.at(buffer)());
+            continue;
+        }
+
         if (bigplus::BPOperator::binaries.contains(buffer)) {
             if (stack.size() < 2) {
                 std::cout << "Insufficient operands" << std::endl;
@@ -57,8 +62,13 @@ auto main(int argc, char** argv) -> int {
         }
 
         try {
-            int64_t operand = std::stoll(buffer);
-            stack.push_back(bigplus::BPScalar(operand));
+            if (buffer.find(".") != std::string::npos) {
+                double operand = std::stod(buffer);
+                stack.push_back(bigplus::BPScalar(operand));
+            } else {
+                int64_t operand = std::stoll(buffer);
+                stack.push_back(bigplus::BPScalar(operand));
+            }
         } catch (std::invalid_argument ex) {
             std::cout << "Bad input: " << ex.what() << std::endl;
         }

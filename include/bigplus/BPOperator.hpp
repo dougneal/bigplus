@@ -4,11 +4,13 @@
 
 #include <map>
 #include <functional>
+#include <cmath>
 
 namespace bigplus {
 
 class BPOperator {
     public:
+    using Constant = std::function<BPScalar()>;
     using Unary = 
         std::function<
             BPScalar(const BPScalar&)>;
@@ -19,6 +21,15 @@ class BPOperator {
         std::function<
             BPScalar(const BPScalar&, const BPScalar&, const BPScalar&)>;
 
+    // Constants
+    static BPScalar pi() { return BPScalar(M_PI); }
+    static BPScalar e() { return BPScalar(M_E); }
+
+    // Unaries
+    // static BPScalar inverse(const BPScalar& x);
+    // static BPScalar sqrt(const BPScalar& x);
+    
+    // Binaries
     static BPScalar add(const BPScalar& x, const BPScalar& y);
     static BPScalar subtract(const BPScalar& x, const BPScalar& y);
     static BPScalar multiply(const BPScalar& x, const BPScalar& y);
@@ -27,6 +38,11 @@ class BPOperator {
     static BPScalar modulo(const BPScalar& x, const BPScalar& y);
     static BPScalar power(const BPScalar& x, const BPScalar& y);
     
+    static inline const std::map<std::string, Constant> constants = {
+        {"pi", Constant(pi)},
+        {"e", Constant(e)}
+    };
+
     static inline const std::map<std::string, Binary> binaries = {
         {"+", Binary(add)},
         {"add", Binary(add)},
