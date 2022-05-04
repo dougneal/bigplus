@@ -37,7 +37,8 @@ class BPOperator {
     static BPScalar quotient(const BPScalar& x, const BPScalar& y);
     static BPScalar modulo(const BPScalar& x, const BPScalar& y);
     static BPScalar power(const BPScalar& x, const BPScalar& y);
-    
+    static BPScalar divide_inverse(const BPScalar& x, const BPScalar& y);
+
     static inline const std::map<std::string, Constant> constants = {
         {"pi", Constant(pi)},
         {"e", Constant(e)}
@@ -54,6 +55,7 @@ class BPOperator {
         {"multiply", Binary(multiply)},
         {"times", Binary(multiply)},
         {"/", Binary(divide)},
+        {"/.", Binary(divide_inverse)},
         {"\\", Binary(quotient)},
         {"div", Binary(quotient)},
         {"%", Binary(modulo)},
@@ -64,4 +66,4 @@ class BPOperator {
     };
 };
 
-}
+} // namespace bigplus

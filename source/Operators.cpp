@@ -38,6 +38,10 @@ BPScalar BPOperator::divide(const BPScalar& x, const BPScalar& y) {
         false);
 }
 
+BPScalar BPOperator::divide_inverse(const BPScalar& x, const BPScalar& y) {
+    return BPOperator::divide(y, x);
+}
+
 BPScalar BPOperator::quotient(const BPScalar& x, const BPScalar& y) {
     int64_t quotient = (x.intValue / y.intValue);
     return BPScalar(
